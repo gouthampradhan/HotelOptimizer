@@ -4,19 +4,19 @@ package hotel.rest.model;
  * Usage report class
  */
 public class Usage {
-    private final int premium;
-    private final int economy;
+    private final int count;
+    private final int amount;
 
-    public Usage(final int premium, final int economy){
-        this.premium = premium;
-        this.economy = economy;
+    public Usage(final int count, final int amount){
+        this.count = count;
+        this.amount = amount;
     }
 
-    public int getPremium() {
-        return premium;
+    public int getCount() {
+        return count;
     }
 
-    public int getEconomy() {
-        return economy;
+    public int getAmount() {
+        return amount;
     }
 }

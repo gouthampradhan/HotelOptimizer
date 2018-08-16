@@ -1,5 +1,6 @@
 package hotel.helper;
 
+import hotel.rest.model.Report;
 import hotel.rest.model.Usage;
 
 import java.util.*;
@@ -45,7 +46,7 @@ public class OptimalUsageCalculator {
      * Calculate optimal usage price
      * @return Usage
      */
-    public Usage calculate(){
+    public Report calculate(){
         List<Integer> economyCustomers = Arrays.stream(offers).filter(o -> o < priceLimit)
                 .boxed()
                 .sorted(Collections.reverseOrder())
@@ -75,6 +76,7 @@ public class OptimalUsageCalculator {
                 }
             } else break;
         }
-        return new Usage(Arrays.stream(premiumRooms).sum(), pq.stream().mapToInt(Integer::intValue).sum());
+        return new Report(new Usage(currPremiumCount, Arrays.stream(premiumRooms).sum()),
+                new Usage(currEconomyCount, pq.stream().mapToInt(Integer::intValue).sum()));
     }
 }
