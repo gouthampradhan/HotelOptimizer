@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
+import hotel.helper.OptimalUsageCalculator;
 import hotel.rest.model.Usage;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -13,9 +14,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Service class to calculate the usage report. The class uses customer.json file from the resource folder as
@@ -29,9 +27,10 @@ public class HotelRoomOptimizationService {
      * Method generates the usage report
      * @param premium number of premium rooms available
      * @param economy number of economy rooms available
+     * @param priceMargin priceMargin which separates economy and premium. Set -1 to use default value.
      * @return Usage report class
      */
-    public Usage generateUsageReport(int premium, int economy){
+    public Usage generateUsageReport(int premium, int economy, int priceMargin){
         Gson gson = new Gson();
         try {
             URL url = getClass().getClassLoader().getResource("customer.json");
@@ -39,7 +38,7 @@ public class HotelRoomOptimizationService {
                 File file = new File(url.getFile());
                 JsonReader reader = new JsonReader(new FileReader(file));
                 int[] offers = gson.fromJson(reader, int[].class);
-                return calculateOptimalUsage(premium, economy, offers);
+                return generateUsageReport(premium, economy, priceMargin, offers);
             } else{
                 log.error("Failed to load JSON input resource. Please ensure that the json input file is" +
                         " present in the resource folder");
@@ -53,37 +52,18 @@ public class HotelRoomOptimizationService {
         return new Usage(0, 0);
     }
 
-    private Usage calculateOptimalUsage(int premium, int economy, int[] offers){
-
-        List<Integer> economyCustomers = Arrays.stream(offers).filter(o -> o < 100)
-                .boxed()
-                .sorted(Collections.reverseOrder())
-                .collect(toList());
-        List<Integer> premiumCustomer = Arrays.stream(offers).filter(o -> o >= 100)
-                .boxed()
-                .sorted(Collections.reverseOrder())
-                .collect(toList());
-        int[] premiumRooms = new int[premium];
-        int currPremiumCount = 0, currEconomyCount = 0;
-        for(int prePrice : premiumCustomer){
-            if(currPremiumCount < premium){
-                premiumRooms[currPremiumCount++] = prePrice;
-            } else break;
-        }
-        Queue<Integer> pq = new PriorityQueue<>();
-        for(int ecoPrice : economyCustomers){
-            if(currEconomyCount < economy){
-                pq.offer(ecoPrice);
-                currEconomyCount++;
-            } else if(currPremiumCount < premium){
-                if(!pq.isEmpty()){
-                    premiumRooms[currPremiumCount++] = pq.poll();
-                    pq.offer(ecoPrice);
-                } else{
-                    premiumRooms[currPremiumCount++] = ecoPrice;
-                }
-            } else break;
-        }
-        return new Usage(Arrays.stream(premiumRooms).sum(), pq.stream().mapToInt(Integer::intValue).sum());
+    /**
+     *
+     * Method generates the usage report
+     * @param premium number of premium rooms available
+     * @param economy number of economy rooms available
+     * @param priceMargin priceMargin which separates economy and premium. Set -1 to use default value.
+     * @param customerOffers price list of customer offer prices
+     * @return Usage report class
+     */
+    public Usage generateUsageReport(int premium, int economy, int priceMargin, int[] customerOffers){
+        if(priceMargin < 0){
+            return new OptimalUsageCalculator(premium, economy, customerOffers).calculate();
+        } else return new OptimalUsageCalculator(premium, economy, customerOffers, priceMargin).calculate();
     }
 }

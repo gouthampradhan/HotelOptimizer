@@ -45,5 +45,7 @@ dependencies {
     testCompile("org.springframework.boot:spring-boot-starter-test")
     // end::tests[]
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+
+    compile 'com.google.guava:guava:26.0-jre'
 }
 
