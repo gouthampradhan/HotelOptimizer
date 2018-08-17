@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 
+/**
+ * REST endpoint controller class. Accepts request parameters and invokes appropriate service.
+ */
 @RestController
 @RequestMapping("/hotel")
 public class HotelRoomOptimizationController {

@@ -1,5 +1,8 @@
 package hotel.rest.model;
 
+/**
+ * Report response class
+ */
 public class Report {
     private final Usage premium;
     private final Usage economy;
