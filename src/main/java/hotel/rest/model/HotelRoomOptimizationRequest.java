@@ -2,6 +2,9 @@ package hotel.rest.model;
 
 import java.util.List;
 
+/**
+ * Pojo class to accept POST request body
+ */
 public class HotelRoomOptimizationRequest {
     private List<Integer> customerOffers;
     private int premium;

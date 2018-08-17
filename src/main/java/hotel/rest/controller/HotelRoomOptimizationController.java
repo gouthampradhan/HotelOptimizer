@@ -18,8 +18,15 @@ import javax.websocket.server.PathParam;
 public class HotelRoomOptimizationController {
 
     @Autowired
-    HotelRoomOptimizationService service;
+    private HotelRoomOptimizationService service;
 
+    /**
+     * GET end point to calculate usage report
+     * @param premium number of premium rooms
+     * @param economy number of economy rooms
+     * @param priceMargin optional priceMargin
+     * @return Report
+     */
     @GetMapping(path = "/usageReport")
     public Report usageReport(@RequestParam(name = "premium", defaultValue = "0") int premium,
                               @RequestParam(name = "economy", defaultValue = "0")int economy,
@@ -27,6 +34,11 @@ public class HotelRoomOptimizationController {
         return service.generateUsageReport(premium < 0 ? 0 : premium, economy < 0 ? 0 : economy, priceMargin);
     }
 
+    /**
+     * POST end point to accept request body and calculate the usage report
+     * @param request HotelRoomOptimizationRequest
+     * @return Report
+     */
     @PostMapping(path = "/usageReport")
     public Report usageReport(@RequestBody HotelRoomOptimizationRequest request) {
         int[] offers = Ints.toArray(request.getCustomerOffers());
