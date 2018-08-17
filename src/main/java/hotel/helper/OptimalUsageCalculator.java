@@ -62,21 +62,21 @@ public class OptimalUsageCalculator {
                 premiumRooms[currPremiumCount++] = prePrice;
             } else break;
         }
-        Queue<Integer> ecoPriceQueue = new ArrayDeque<>();
+        Queue<Integer> economyRooms = new ArrayDeque<>();
         for(int ecoPrice : economyCustomers){
             if(currEconomyCount < economy){
-                ecoPriceQueue.offer(ecoPrice);
+                economyRooms.offer(ecoPrice);
                 currEconomyCount++;
             } else if(currPremiumCount < premium){
-                if(!ecoPriceQueue.isEmpty()){
-                    premiumRooms[currPremiumCount++] = ecoPriceQueue.poll();
-                    ecoPriceQueue.offer(ecoPrice);
+                if(!economyRooms.isEmpty()){
+                    premiumRooms[currPremiumCount++] = economyRooms.poll();
+                    economyRooms.offer(ecoPrice);
                 } else{
                     premiumRooms[currPremiumCount++] = ecoPrice;
                 }
             } else break;
         }
         return new Report(new Usage(currPremiumCount, Arrays.stream(premiumRooms).sum()),
-                new Usage(currEconomyCount, ecoPriceQueue.stream().mapToInt(Integer::intValue).sum()));
+                new Usage(currEconomyCount, economyRooms.stream().mapToInt(Integer::intValue).sum()));
     }
 }
